@@ -1,184 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CountryQ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 2rem auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CountryQ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #3498db;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 2rem auto;
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col items-center p-4 antialiased">
+<body
+  class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col items-center p-4 antialiased"
+>
+  <div
+    class="w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8 flex flex-col justify-between"
+  >
+    <!-- Header -->
+    <div>
+      <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+          CountryQ
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">
+          Get information about any country.
+        </p>
+      </div>
 
-    <div class="w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">CountryQ</h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-2">Get information about any country.</p>
+      <!-- Search Input -->
+      <div class="relative mb-6 flex flex-col sm:flex-row gap-2">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Enter a country name or code (e.g., Japan, US, UAE)"
+          class="flex-grow px-4 py-3 text-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:border-blue-500 focus:ring-0 rounded-xl transition duration-300"
+        />
+        <div class="flex gap-2 sm:flex-col sm:gap-0">
+          <!-- switched positions -->
+          <button
+            id="clear-button"
+            class="w-full sm:w-auto bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-transform transform active:scale-95"
+          >
+            Clear
+          </button>
+          <button
+            id="search-button"
+            class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-transform transform active:scale-95"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Area -->
+      <div id="result-container">
+        <div id="loader" class="hidden">
+          <div class="spinner"></div>
+        </div>
+        <div
+          id="error-message"
+          class="hidden text-center bg-red-100 dark:bg-red-900/50 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl"
+        >
+          <p>Could not find country. Please check the spelling and try again.</p>
         </div>
 
-        <!-- Search Input -->
-        <div class="relative mb-6">
-            <input type="text" id="search-input" placeholder="Enter a country name (e.g., Japan)" class="w-full px-4 py-3 text-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:border-blue-500 focus:ring-0 rounded-xl transition duration-300">
-            <button id="search-button" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-transform transform active:scale-95">
-                Search
+        <!-- Country Info -->
+        <div id="country-info" class="hidden">
+          <div
+            class="flex flex-col md:flex-row items-center gap-6 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700"
+          >
+            <img
+              id="country-flag"
+              src=""
+              alt="Country Flag"
+              class="w-32 h-auto object-cover rounded-lg shadow-md"
+            />
+            <div class="text-center md:text-left">
+              <h2 id="country-name" class="text-3xl font-bold"></h2>
+              <p id="official-name" class="text-gray-500 dark:text-gray-400"></p>
+            </div>
+          </div>
+
+          <!-- Info Blocks -->
+          <h3 class="text-lg font-semibold mb-2">📍 Geography</h3>
+          <div class="info-grid mb-4">
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Continent</h3>
+              <p id="continent" class="text-xl font-medium"></p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Capital City</h3>
+              <p id="capital" class="text-xl font-medium"></p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Area</h3>
+              <p id="area" class="text-xl font-medium"></p>
+            </div>
+          </div>
+
+          <h3 class="text-lg font-semibold mb-2">👥 Demographics</h3>
+          <div class="info-grid mb-4">
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Population</h3>
+              <p id="population" class="text-xl font-medium"></p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Languages</h3>
+              <p id="languages" class="text-xl font-medium"></p>
+            </div>
+          </div>
+
+          <h3 class="text-lg font-semibold mb-2">🌐 Codes & Borders</h3>
+          <div class="info-grid mb-4">
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Calling Code</h3>
+              <p id="calling-code" class="text-xl font-medium"></p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">TLD</h3>
+              <p id="tld" class="text-xl font-medium"></p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Borders</h3>
+              <p id="borders" class="text-xl font-medium"></p>
+            </div>
+          </div>
+
+          <h3 class="text-lg font-semibold mb-2">🕓 Other</h3>
+          <div class="info-grid mb-6">
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Currency</h3>
+              <p id="currency" class="text-xl font-medium"></p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Car Driving Side</h3>
+              <p id="car-side" class="text-xl font-medium"></p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <h3 class="font-semibold text-sm">Timezones</h3>
+              <p id="timezones" class="text-xl font-medium"></p>
+            </div>
+          </div>
+
+          <!-- Buttons Section -->
+          <div class="mt-6 text-center space-y-3">
+            <a
+              id="map-link"
+              href="#"
+              target="_blank"
+              class="inline-block w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition-transform transform active:scale-95"
+              >🌍 View on Map</a
+            >
+            <button
+              id="share-button"
+              class="inline-block w-full sm:w-auto bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded-lg transition-transform transform active:scale-95"
+            >
+              📤 Share
             </button>
+            <p
+              id="share-note"
+              class="mt-3 text-gray-600 dark:text-gray-400 text-sm hidden"
+            >
+              To check such details about your country or other countries, visit <br />
+              <a
+                href="https://sauravhhh.github.io/CountryQ/"
+                target="_blank"
+                class="text-blue-600 dark:text-blue-400 font-medium underline"
+                >https://sauravhhh.github.io/CountryQ/</a
+              >
+            </p>
+          </div>
         </div>
-
-        <!-- Results Area -->
-        <div id="result-container">
-            <!-- Loading Spinner -->
-            <div id="loader" class="hidden">
-                <div class="spinner"></div>
-            </div>
-            <!-- Error Message -->
-            <div id="error-message" class="hidden text-center bg-red-100 dark:bg-red-900/50 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl">
-                <p>Could not find country. Please check the spelling and try again.</p>
-            </div>
-            <!-- Country Info -->
-            <div id="country-info" class="hidden">
-                <!-- Flag and Names -->
-                <div class="flex flex-col md:flex-row items-center gap-6 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
-                    <img id="country-flag" src="" alt="Country Flag" class="w-32 h-auto object-cover rounded-lg shadow-md">
-                    <div class="text-center md:text-left">
-                        <h2 id="country-name" class="text-3xl font-bold"></h2>
-                        <p id="official-name" class="text-gray-500 dark:text-gray-400"></p>
-                    </div>
-                </div>
-
-                <!-- Main Info Grid -->
-                <div class="info-grid">
-                    <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-                        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm">Capital City</h3>
-                        <p id="capital" class="text-xl font-medium"></p>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-                        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm">Population</h3>
-                        <p id="population" class="text-xl font-medium"></p>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-                        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm">Continent</h3>
-                        <p id="continent" class="text-xl font-medium"></p>
-                    </div>
-                     <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-                        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm">Currency</h3>
-                        <p id="currency" class="text-xl font-medium"></p>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-                        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm">Languages</h3>
-                        <p id="languages" class="text-xl font-medium"></p>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-                        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm">Timezones</h3>
-                        <p id="timezones" class="text-xl font-medium"></p>
-                    </div>
-                </div>
-                 <div class="mt-6 text-center">
-                    <a id="map-link" href="#" target="_blank" class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition-transform transform active:scale-95">
-                        View on Map
-                    </a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM ELEMENTS ---
-            const searchInput = document.getElementById('search-input');
-            const searchButton = document.getElementById('search-button');
-            const loader = document.getElementById('loader');
-            const errorMessage = document.getElementById('error-message');
-            const countryInfoContainer = document.getElementById('country-info');
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+      Made with ❤️ by <span class="font-semibold">Sauravhhh</span>
+    </footer>
+  </div>
 
-            // --- API URL ---
-            const API_URL = 'https://restcountries.com/v3.1/name/';
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("search-input");
+      const searchButton = document.getElementById("search-button");
+      const clearButton = document.getElementById("clear-button");
+      const shareButton = document.getElementById("share-button");
+      const loader = document.getElementById("loader");
+      const errorMessage = document.getElementById("error-message");
+      const countryInfoContainer = document.getElementById("country-info");
+      const shareNote = document.getElementById("share-note");
 
-            // --- EVENT LISTENERS ---
-            searchButton.addEventListener('click', searchCountry);
-            searchInput.addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    searchCountry();
-                }
+      const API_URL = "https://restcountries.com/v3.1/name/";
+      const CODE_URL = "https://restcountries.com/v3.1/alpha/";
+
+      const shortCodeMap = {
+        UAE: "United Arab Emirates",
+        US: "United States",
+        UK: "United Kingdom",
+        NZ: "New Zealand",
+        KR: "South Korea",
+        RU: "Russia",
+        LA: "Laos",
+        IR: "Iran",
+        MY: "Malaysia",
+        VE: "Venezuela",
+      };
+
+      function normalizeInput(input) {
+        const up = input.trim().toUpperCase();
+        return shortCodeMap[up] || input.trim();
+      }
+
+      searchButton.addEventListener("click", () => {
+        const normalized = normalizeInput(searchInput.value);
+        searchInput.value = normalized;
+        searchCountry();
+      });
+      searchInput.addEventListener("keyup", (event) => {
+        if (event.key === "Enter") {
+          let normalized = normalizeInput(searchInput.value);
+          searchInput.value = normalized;
+          searchCountry();
+        }
+      });
+      clearButton.addEventListener("click", () => {
+        searchInput.value = "";
+        hideAllSections();
+      });
+
+      shareButton.addEventListener("click", async () => {
+        const country = document.getElementById("country-name").textContent;
+        if (!country) {
+          alert("Please search and load a country first.");
+          return;
+        }
+
+        const capital = document.getElementById("capital").textContent;
+        const population = document.getElementById("population").textContent;
+        const languages = document.getElementById("languages").textContent;
+        const continent = document.getElementById("continent").textContent;
+        const area = document.getElementById("area").textContent;
+        const callingCode = document.getElementById("calling-code").textContent;
+        const tld = document.getElementById("tld").textContent;
+        const borders = document.getElementById("borders").textContent;
+        const currency = document.getElementById("currency").textContent;
+        const carSide = document.getElementById("car-side").textContent;
+        const timezones = document.getElementById("timezones").textContent;
+
+        const shareText =
+          "*Country Information*\n\n" +
+          `Country: ${country}\n` +
+          `Official Name: ${document.getElementById("official-name").textContent}\n` +
+          `Capital: ${capital}\n` +
+          `Continent: ${continent}\n` +
+          `Area: ${area}\n` +
+          `Population: ${population}\n` +
+          `Languages: ${languages}\n` +
+          `Calling Code: ${callingCode}\n` +
+          `TLD: ${tld}\n` +
+          `Borders: ${borders}\n` +
+          `Currency: ${currency}\n` +
+          `Driving Side: ${carSide}\n` +
+          `Timezone: ${timezones}\n\n` +
+          "To check such details about your country or others, visit https://sauravhhh.github.io/CountryQ/";
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: `Country info: ${country}`,
+              text: shareText,
             });
+            shareNote.classList.remove("hidden");
+            setTimeout(() => shareNote.classList.add("hidden"), 8000);
+          } catch (err) {
+            console.error("Share failed:", err.message);
+            shareNote.classList.add("hidden");
+          }
+        } else {
+          alert("Sharing not supported on this device/browser.");
+        }
+      });
 
-            // --- MAIN FUNCTION ---
-            async function searchCountry() {
-                const countryName = searchInput.value.trim();
-                if (!countryName) return;
+      function formatIndianNumber(x) {
+        let num = x.toString();
+        let lastThree = num.substring(num.length - 3);
+        let otherNumbers = num.substring(0, num.length - 3);
+        if (otherNumbers !== "") lastThree = "," + lastThree;
+        return otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+      }
 
-                // --- UI State: Loading ---
-                hideAllSections();
-                loader.classList.remove('hidden');
+      async function searchCountry() {
+        const countryName = searchInput.value.trim();
+        if (!countryName) return;
+        hideAllSections();
+        loader.classList.remove("hidden");
 
-                try {
-                    const response = await fetch(`${API_URL}${countryName}`);
-                    if (!response.ok) {
-                        throw new Error('Country not found');
-                    }
-                    const data = await response.json();
-                    displayCountryInfo(data[0]);
-                } catch (error) {
-                    console.error('Error fetching country data:', error);
-                    // --- UI State: Error ---
-                    hideAllSections();
-                    errorMessage.classList.remove('hidden');
-                }
-            }
+        try {
+          const response = await fetch(
+            `${API_URL}${encodeURIComponent(countryName)}?fullText=true`
+          );
+          if (!response.ok) throw new Error("Country not found");
+          const data = await response.json();
+          await displayCountryInfo(data[0]);
+        } catch (error) {
+          console.error("Error fetching country data:", error);
+          hideAllSections();
+          errorMessage.classList.remove("hidden");
+        }
+      }
 
-            // --- UI UPDATE FUNCTIONS ---
-            function displayCountryInfo(country) {
-                // --- UI State: Success ---
-                hideAllSections();
-                countryInfoContainer.classList.remove('hidden');
+      async function displayCountryInfo(country) {
+        hideAllSections();
+        countryInfoContainer.classList.remove("hidden");
 
-                // --- Populate data ---
-                document.getElementById('country-flag').src = country.flags.svg;
-                document.getElementById('country-name').textContent = country.name.common;
-                document.getElementById('official-name').textContent = country.name.official;
-                
-                document.getElementById('capital').textContent = country.capital ? country.capital[0] : 'N/A';
-                document.getElementById('population').textContent = country.population.toLocaleString();
-                document.getElementById('continent').textContent = country.continents[0];
-                
-                const currency = Object.values(country.currencies)[0];
-                document.getElementById('currency').textContent = `${currency.name} (${currency.symbol})`;
-                
-                document.getElementById('languages').textContent = Object.values(country.languages).join(', ');
-                document.getElementById('timezones').textContent = country.timezones.join(', ');
-                
-                document.getElementById('map-link').href = country.maps.googleMaps;
-            }
+        document.getElementById("country-flag").src = country.flags.svg;
+        document.getElementById("country-name").textContent = country.name.common;
+        document.getElementById("official-name").textContent = country.name.official;
 
-            function hideAllSections() {
-                loader.classList.add('hidden');
-                errorMessage.classList.add('hidden');
-                countryInfoContainer.classList.add('hidden');
-            }
-        });
-    </script>
+        document.getElementById("capital").textContent = country.capital
+          ? country.capital[0]
+          : "N/A";
+        document.getElementById("continent").textContent =
+          country.continents[0] || "N/A";
+        document.getElementById("area").textContent = country.area
+          ? formatIndianNumber(country.area) + " km²"
+          : "N/A";
+
+        document.getElementById("population").textContent = formatIndianNumber(
+          country.population
+        );
+
+        document.getElementById("languages").textContent = country.languages
+          ? Object.values(country.languages).join(", ")
+          : "N/A";
+
+        document.getElementById("timezones").textContent = country.timezones
+          ? country.timezones.join(", ")
+          : "N/A";
+        document.getElementById("car-side").textContent = country.car?.side
+          ? country.car.side.charAt(0).toUpperCase() + country.car.side.slice(1)
+          : "N/A";
+
+        const currency = Object.values(country.currencies || {})[0];
+        document.getElementById("currency").textContent = currency
+          ? `${currency.name} (${currency.symbol})`
+          : "N/A";
+
+        document.getElementById("calling-code").textContent = country.idd?.root
+          ? country.idd.root + (country.idd.suffixes ? country.idd.suffixes[0] : "")
+          : "N/A";
+        document.getElementById("tld").textContent = country.tld
+          ? country.tld.join(", ")
+          : "N/A";
+
+        if (country.borders && country.borders.length > 0) {
+          try {
+            const resp = await fetch(
+              `${CODE_URL}?codes=${country.borders.join(",")}`
+            );
+            const borderData = await resp.json();
+            const borderNames = borderData.map((b) => b.name.common);
+            document.getElementById("borders").textContent = borderNames.join(
+              ", "
+            );
+          } catch {
+            document.getElementById("borders").textContent = country.borders.join(
+              ", "
+            );
+          }
+        } else {
+          document.getElementById("borders").textContent = "None";
+        }
+
+        document.getElementById("map-link").href = country.maps.googleMaps;
+      }
+
+      function hideAllSections() {
+        loader.classList.add("hidden");
+        errorMessage.classList.add("hidden");
+        countryInfoContainer.classList.add("hidden");
+        shareNote.classList.add("hidden");
+      }
+    });
+  </script>
 </body>
-  </html>
-  
+</html>
